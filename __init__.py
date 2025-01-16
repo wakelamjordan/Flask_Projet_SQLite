@@ -14,7 +14,22 @@ def home():
 
 @app.route('/livres')
 def livres():
-    return render_template('bibliotheque/livres.html')
+    
+    data = query('SELECT * FROM vue_livres;')
+    
+    return render_template('bibliotheque/livres.html', data=data)
+
+def query(sql):
+    conn = sqlite3.connect('database2.db')
+    cursor = conn.cursor()
+    
+    cursor.execute(sql)
+    
+    response = cursor.fetchall()
+    
+    conn.close()
+    
+    return response
 
 
 # # Fonction pour créer une clé "authentifie" dans la session utilisateur

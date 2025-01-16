@@ -8,4 +8,28 @@ Livres
 <h1 class="text-3xl">
     Liste des livres disponibles
 </h1>
+
+<div class="overflow-x-auto">
+    <table class="table table-zebra text-center">
+        <!-- head -->
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Titre</th>
+                <th>Auteur</th>
+                <th>Disponible</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in data %}
+            <tr>
+                <th>{{ligne[0]}}</th>
+                <th>{{ligne[1]}}</th>
+                <th>{{ligne[2]}}</th>
+                <th>{{ligne[3]-ligne[4]}}</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
