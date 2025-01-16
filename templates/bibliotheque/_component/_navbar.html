@@ -34,9 +34,18 @@
             <li>
                 <a href="{{url_for('connection')}}">connection</a>
             </li>
+            {% if session['authentifie'] is defined %}
+                {% if session['authentifie'].login == 'admin' %}
+                    <a class="btn" href="{{url_for('users')}}">Utilisateurs</a>
+                {% endif %}
+            {% endif %}
         </ul>
     </div>
-    <!-- <div class="navbar-end">
-        <a class="btn">Button</a>
-    </div> -->
+    <div class="navbar-end">
+        {% if session['authentifie'] is defined %}
+        <a class="btn" href="{{url_for('deconnection')}}">{{ session['authentifie'].login }}</a>
+        {% else %}
+        <a class="btn" href="{{url_for('connection')}}">Connection</a>
+        {% endif %}
+    </div>
 </div>

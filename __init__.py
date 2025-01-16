@@ -8,9 +8,9 @@ import sqlite3
 app = Flask(__name__)                                                                                                                  
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Clé secrète pour les sessions
 
-@app.route('/')
+@app.route('/',methods=['GET'])
 def home():
-    return render_template('bibliotheque/index.html',methods=['GET'])
+    return render_template('bibliotheque/index.html')
 
 @app.route('/livres',methods=['GET'])
 def livres():
@@ -42,11 +42,89 @@ def apiLivre(titre):
     
     return jsonify(data), 200
 
+def estConnecte():
+    return session.get('authentifie')
+
+@app.route('/deconnection',methods=['GET'])
+def deconnection():
+    session.clear()
+    return redirect(url_for('home'))
+    
+
 @app.route('/connection',methods=['GET','POST'])
 def connection():
+    
+    if estConnecte():
+        return redirect(url_for("home"))
+    
     if request.method == "POST":
-        return 'post'
-    return render_template('bibliotheque/connection.html')
+        if request.form['username'] and request.form['password']:
+            conn = sqlite3.connect('database2.db')
+            
+            cursor = conn.cursor()
+            
+            cursor.execute('SELECT * FROM user WHERE login = ? AND password = ? ;',(request.form['username'],request.form['password']))
+            
+            userIdentifie = cursor.fetchall()
+            
+            conn.close()
+            
+            if userIdentifie :
+                session['authentifie']={
+                    'role' : userIdentifie[0][3],
+                    'login' : userIdentifie[0][1]
+                }
+                return redirect(url_for("home"))
+            else:
+                return render_template('bibliotheque/connection.html', error=True)
+            
+    return render_template('bibliotheque/connection.html', error=False)
+
+def estAdmin():
+    role = session.get('authentifie')
+    
+    if session.get('authentifie') and session['authentifie']['role'] == 'admin':
+        return True
+    
+    return False
+
+@app.route('/api/users', methods=['GET'])
+def users():
+    if not estAdmin():
+        return redirect(url_for('home'))
+    
+    data = query('SELECT * FROM user;')
+    
+    return jsonify(data), 200
+# @app.route('/users')
+# def users():
+
+def query(sql):
+    conn = sqlite3.connect('database2.db')
+    cursor = conn.cursor()
+    
+    cursor.execute(sql)
+    
+    response = cursor.fetchall()
+    
+    conn.close()
+    
+    return response
+
+@app.route('/api/user/<int:id>', methods=['GET'])
+def user(id):
+    if not estAdmin():
+        return redirect(url_for('home'))
+
+    conn = sqlite3.connect('database2.db')
+    
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM user WHERE id = ? ;',(id,))
+    data = cursor.fetchall()
+    
+    conn.close()
+    
+    return jsonify(data), 200
 # @app.route('/users')
 # def users():
 
