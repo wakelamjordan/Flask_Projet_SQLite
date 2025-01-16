@@ -7,6 +7,7 @@ with open('schema2.sql') as f:
 
 cur = connection.cursor()
     
+cur.execute("INSERT INTO user (login, password,role) VALUES (?, ?, ?)", ('admin', 'password', 'admin'))
 cur.execute("INSERT INTO user (login, password) VALUES (?, ?)", ('jdoe', 'password123'))
 cur.execute("INSERT INTO user (login, password) VALUES (?, ?)", ('asmith', 'securepwd'))
 cur.execute("INSERT INTO user (login, password) VALUES (?, ?)", ('bjackson', 'mypassword'))

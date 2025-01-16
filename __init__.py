@@ -10,23 +10,23 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Clé secrète pour les sessions
 
 @app.route('/')
 def home():
-    return render_template('bibliotheque/index.html')
+    return render_template('bibliotheque/index.html',methods=['GET'])
 
-@app.route('/livres')
+@app.route('/livres',methods=['GET'])
 def livres():
     
     data = query('SELECT * FROM vue_livres;')
     
     return render_template('bibliotheque/livres.html', data=data)
 
-@app.route('/api/livres')
+@app.route('/api/livres',methods=['GET'])
 def apiLivres():
     
     data = query('SELECT * FROM vue_livres;')
     
     return jsonify(data), 200
 
-@app.route('/api/livre/<titre>')
+@app.route('/api/livre/<titre>',methods=['GET'])
 def apiLivre(titre):
     param = "%"+titre+"%"
     
@@ -42,6 +42,11 @@ def apiLivre(titre):
     
     return jsonify(data), 200
 
+@app.route('/connection',methods=['GET','POST'])
+def connection():
+    if request.method == "POST":
+        return 'post'
+    return render_template('bibliotheque/connection.html')
 # @app.route('/users')
 # def users():
 

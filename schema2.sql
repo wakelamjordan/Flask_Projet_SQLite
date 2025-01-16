@@ -1,11 +1,12 @@
 -- PRAGMA foreign_keys = ON;
 
-DROP TABLE IF EXISTS livres;
+DROP TABLE IF EXISTS user;
 
 CREATE TABLE IF NOT EXISTS user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  login TEXT NOT NULL,
-  password TEXT NOT NULL
+  login TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'user' -- Rôle par défaut : 'user'
 );
 
 DROP TABLE IF EXISTS livres;
