@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+        Bibliotheque
+        {% endblock %}
+    </title>
+    <link href="./static/style/output.css" rel="stylesheet">
+</head>
+
+<body class="bg-black grid grid-cols-[150px_1fr_150px] min-h-screen">
+    <main class="col-start-2 min-h-screen bg-gray-500">
+        {% include 'bibliotheque/_component/_navbar.html' %}
+        <div class="p-5">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+</body>
+
+</html>

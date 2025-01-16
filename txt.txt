@@ -1,1 +1,3 @@
 ssh jordanwakelam1@ssh-jordanwakelam1.alwaysdata.net
+
+npx tailwindcss -i ./static/style/input.css -o ./static/style/output.css --watch
