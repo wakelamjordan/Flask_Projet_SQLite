@@ -1,3 +1,20 @@
 <!doctype html>
 <title>Flask Server</title>
 <h1> Hello from Flask Server !</h1>
+
+<nav>
+    <ul>
+        <li>
+            <a href="{{url_for('lecture')}}">lecture</a>
+        </li>
+        <li>
+            <a href="{{url_for('Readfiche',post_id=1)}}">Readfiche</a>
+        </li>
+        <li>
+            <a href="{{url_for('ReadBDD')}}">cosultation</a>
+        </li>
+        <li>
+            <a href="{{url_for('exercice')}}">fiche_nom</a>
+        </li>
+    </ul>
+</nav>
