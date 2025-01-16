@@ -19,6 +19,32 @@ def livres():
     
     return render_template('bibliotheque/livres.html', data=data)
 
+@app.route('/api/livres')
+def apiLivres():
+    
+    data = query('SELECT * FROM vue_livres;')
+    
+    return jsonify(data), 200
+
+@app.route('/api/livre/<titre>')
+def apiLivre(titre):
+    param = "%"+titre+"%"
+    
+    # data = query('SELECT * FROM vue_livres WHERE titre=? OR auteur=?;')
+    
+    conn = sqlite3.connect('database2.db')
+    
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM vue_livres WHERE titre LIKE ? OR auteur LIKE ?;', (param, param))
+    data = cursor.fetchall()
+    
+    conn.close()
+    
+    return jsonify(data), 200
+
+# @app.route('/users')
+# def users():
+
 def query(sql):
     conn = sqlite3.connect('database2.db')
     cursor = conn.cursor()
