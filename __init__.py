@@ -5,111 +5,136 @@ from urllib.request import urlopen
 from werkzeug.utils import secure_filename
 import sqlite3
 
-app = Flask(__name__)                                                                                                                  
+app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Clé secrète pour les sessions
 
-@app.route('/',methods=['GET'])
+
+@app.route('/', methods=['GET'])
 def home():
     return render_template('bibliotheque/index.html')
 
-@app.route('/livres',methods=['GET'])
+
+@app.route('/livres', methods=['GET'])
 def livres():
-    
+
     data = query('SELECT * FROM vue_livres;')
-    
+
     return render_template('bibliotheque/livres.html', data=data)
 
-@app.route('/api/livres',methods=['GET'])
+
+@app.route('/api/livres', methods=['GET'])
 def apiLivres():
-    
+
     data = query('SELECT * FROM vue_livres;')
-    
+
     return jsonify(data), 200
 
-@app.route('/api/livre/<titre>',methods=['GET'])
+
+@app.route('/api/livre/<titre>', methods=['GET'])
 def apiLivre(titre):
-    param = "%"+titre+"%"
-    
+    param = "%" + titre + "%"
+
     # data = query('SELECT * FROM vue_livres WHERE titre=? OR auteur=?;')
-    
+
     conn = sqlite3.connect('database2.db')
-    
+
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM vue_livres WHERE titre LIKE ? OR auteur LIKE ?;', (param, param))
+    cursor.execute(
+        'SELECT * FROM vue_livres WHERE titre LIKE ? OR auteur LIKE ?;',
+        (param, param))
     data = cursor.fetchall()
-    
+
     conn.close()
-    
+
     return jsonify(data), 200
+
 
 def estConnecte():
     return session.get('authentifie')
 
-@app.route('/deconnection',methods=['GET'])
+
+@app.route('/deconnection', methods=['GET'])
 def deconnection():
     session.clear()
-    return redirect(url_for('home'))
-    
+    # return redirect(url_for('home'))
+    return jsonify({"disconnect": True}), 200
 
-@app.route('/connection',methods=['GET','POST'])
+
+@app.route('/connection', methods=['GET', 'POST'])
 def connection():
-    
+
+    return jsonify({"connection": True}), 200
+
     if estConnecte():
-        return redirect(url_for("home"))
-    
+        # return redirect(url_for("home"))
+        return jsonify({"connection": True}), 200
+
     if request.method == "POST":
         if request.form['username'] and request.form['password']:
             conn = sqlite3.connect('database2.db')
-            
+
             cursor = conn.cursor()
-            
-            cursor.execute('SELECT * FROM user WHERE login = ? AND password = ? ;',(request.form['username'],request.form['password']))
-            
+
+            cursor.execute(
+                'SELECT * FROM user WHERE login = ? AND password = ? ;',
+                (request.form['username'], request.form['password']))
+
             userIdentifie = cursor.fetchall()
-            
+
             conn.close()
-            
-            if userIdentifie :
-                session['authentifie']={
-                    'role' : userIdentifie[0][3],
-                    'login' : userIdentifie[0][1]
+
+            if userIdentifie:
+                session['authentifie'] = {
+                    'role': userIdentifie[0][3],
+                    'login': userIdentifie[0][1]
                 }
-                return redirect(url_for("home"))
+                # return redirect(url_for("home"))
+                return jsonify({"connection": True}), 200
             else:
-                return render_template('bibliotheque/connection.html', error=True)
-            
-    return render_template('bibliotheque/connection.html', error=False)
+                return jsonify({"connection": False}), 401
+                # return render_template('bibliotheque/connection.html',
+                #                        error=True)
+
+    # return render_template('bibliotheque/connection.html', error=False)
+    return jsonify({"testconnection": True}), 200
+
 
 def estAdmin():
     role = session.get('authentifie')
-    
-    if session.get('authentifie') and session['authentifie']['role'] == 'admin':
+
+    if session.get(
+            'authentifie') and session['authentifie']['role'] == 'admin':
         return True
-    
+
     return False
+
 
 @app.route('/api/users', methods=['GET'])
 def users():
     if not estAdmin():
         return redirect(url_for('home'))
-    
+
     data = query('SELECT * FROM user;')
-    
+
     return jsonify(data), 200
+
+
 # @app.route('/users')
 # def users():
+
 
 def query(sql):
     conn = sqlite3.connect('database2.db')
     cursor = conn.cursor()
-    
+
     cursor.execute(sql)
-    
+
     response = cursor.fetchall()
-    
+
     conn.close()
-    
+
     return response
+
 
 @app.route('/api/user/<int:id>', methods=['GET'])
 def user(id):
@@ -117,27 +142,30 @@ def user(id):
         return redirect(url_for('home'))
 
     conn = sqlite3.connect('database2.db')
-    
+
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM user WHERE id = ? ;',(id,))
+    cursor.execute('SELECT * FROM user WHERE id = ? ;', (id, ))
     data = cursor.fetchall()
-    
+
     conn.close()
-    
+
     return jsonify(data), 200
+
+
 # @app.route('/users')
 # def users():
+
 
 def query(sql):
     conn = sqlite3.connect('database2.db')
     cursor = conn.cursor()
-    
+
     cursor.execute(sql)
-    
+
     response = cursor.fetchall()
-    
+
     conn.close()
-    
+
     return response
 
 
@@ -165,9 +193,9 @@ def query(sql):
 #         match request.form['username']:
 #             case "admin":
 #                 if request.form['password']=='password':
-                    
+
 #                     session['authentifie']=True
-                    
+
 #                       # Si l'utilisateur est authentifié
 #                     return "<h2>Bravo, vous êtes authentifié</h2>"
 #                 else:
@@ -179,7 +207,7 @@ def query(sql):
 #                     return "<h2>Bravo, vous êtes authentifié</h2>"
 #                 else:
 #                     return render_template('formulaire_authentification.html', error=True)
-#             case _:    
+#             case _:
 #                     return render_template('formulaire_authentification.html', error=True)
 #         # if request.form['username'] == 'admin' and request.form['password'] == 'password': # password à cacher par la suite
 #         #     session['authentifie'] = True
@@ -234,17 +262,15 @@ def query(sql):
 #     if not est_authentifie():
 #         # Rediriger vers la page d'authentification si l'utilisateur n'est pas authentifié
 #         return redirect(url_for('authentification'))
-    
+
 #     conn = sqlite3.connect('database.db')
 #     cursor = conn.cursor()
 #     cursor.execute('SELECT * FROM clients WHERE nom = ?', (nom,))
 #     data = cursor.fetchall()
 #     conn.close()
-    
 
 #   # Si l'utilisateur est authentifié
 #     return render_template('exercice.html',data=data)
 
-                                                                                                                                       
 if __name__ == "__main__":
-  app.run(debug=True)
+    app.run(debug=True)
